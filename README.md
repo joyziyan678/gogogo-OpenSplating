@@ -1,6 +1,6 @@
 # gogogo-OpenSplating
 
-# Full Pipeline Report (Subset 200–7498, Step 10) + OpenSplat
+# A Local Pipeline with OpenSplat
 
 # Executive summary
 We reconstruct an AMtown02 urban scene from UAV-style sequential frames. A decimated subset (frames 200–7498, every 10th frame, ~730 images) is processed with COLMAP, then OpenSplat optimizes 3D Gaussians for real-time-style novel view synthesis.
