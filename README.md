@@ -83,7 +83,8 @@ After training finishes normally, the current working directory (the one you cd 
 If you used -o, look for the output file at the specified path.
 
 # Step 8 – View the Result Locally
-Open the resulting splat.ply or exported .splat file with a locally installed 3D Gaussian viewer or editor (e.g.[, common web viewers, SuperSplat, CloudCompare, etc.](https://playcanvas.com/viewer), depending on the tools you have installed).
+Open the resulting splat.ply or exported .splat file with a locally installed 3D Gaussian viewer or editor
+(e.g.[, common web viewers, SuperSplat, CloudCompare, etc.](https://playcanvas.com/viewer), depending on the tools you have installed).
 
 # Appendix – When You Need to Re‑run COLMAP
 If you encounter a database is locked error, a mid‑way failure, or want to switch to a different subset:
