@@ -1,7 +1,6 @@
 # gogogo-OpenSplating
 
 # Local COLMAP + OpenSplat Pipeline (Windows)
-A free and open source implementation of 3D Gaussian Splatting written in C++, focused on being portable, lean and fast. Based on OpenSplat by pierotofy.
 
 # Scope
 Under the local Windows directory d:\lzy\OpenSplat-main, starting from an existing image sequence, perform COLMAP sparse reconstruction and OpenSplat Gaussian training sequentially until a splat file is obtained.
