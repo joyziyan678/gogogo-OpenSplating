@@ -57,7 +57,9 @@ Make sure the following are present on your system:
 The script colmap_reconstruct.ps1 automatically finds COLMAP. Alternatively, set the environment variable COLMAP_EXE to point to your colmap.exe.
 
 # Methodology
-Pipeline: (1) copy subset with make_clip_scene.ps1;
+Pipeline:
+
+(1) copy subset with make_clip_scene.ps1;
 
 (2) COLMAP feature_extractor → sequential_matcher (overlap=25) → mapper; 
 
