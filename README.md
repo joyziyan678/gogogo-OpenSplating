@@ -1,80 +1,49 @@
 # gogogo-OpenSplating
 
-# Local COLMAP + OpenSplat Pipeline (Windows)
+# Full Pipeline Report (Subset 200–7498, Step 10) + OpenSplat
 
-# Scope
-Under the local Windows directory d:\lzy\OpenSplat-main, starting from an existing image sequence, perform COLMAP sparse reconstruction and OpenSplat Gaussian training sequentially until a splat file is obtained.
-All operations below are local – no cloud upload, no remote training, no packaging/migration.
+# Executive summary
+We reconstruct an AMtown02 urban scene from UAV-style sequential frames. A decimated subset (frames 200–7498, every 10th frame, ~730 images) is processed with COLMAP, then OpenSplat optimizes 3D Gaussians for real-time-style novel view synthesis.
 
-#  Introduction & Background
-3D Gaussian Splatting (3DGS) represents a breakthrough in neural rendering, offering real-time rendering capabilities while maintaining high visual quality. Unlike Neural Radiance Fields (NeRF) that rely on implicit representations (MLPs) to model volumetric radiance fields, 3DGS explicitly represents scenes using millions of 3D Gaussian primitives, enabling real-time rendering at high resolutions, efficient training compared to NeRF-based methods, explicit geometry that can be directly manipulated, and high-quality novel view synthesis.
+# Background
+3D Gaussian Splatting (3DGS) represents a scene with millions of anisotropic 3D Gaussians optimized via differentiable rasterization. Compared with NeRF, it often enables faster training and real-time rendering with explicit geometry.
 
-However, NeRF is highly computation-intensive and, due to its implicit representation, poses considerable challenges in terms of editability and interactive manipulation. To overcome these limitations, 3D Gaussian Splatting has emerged as a novel paradigm for scene representation and rendering. 3DGS has achieved remarkable progress in novel view synthesis, leveraging millions of Gaussian ellipsoids for scene reconstruction and employing parallel differentiable rasterization to substantially improve rendering efficiency. For a detailed comparison, see the OpenSplat DeepWiki overview.
+OpenSplat (C++/LibTorch) ingests standard COLMAP projects (sparse points + cameras) and outputs splat.ply / cameras.json (or custom names). COLMAP provides camera poses and sparse initialization.
 
-This project demonstrates the application of state-of-the-art neural rendering techniques for reconstructing 3D scenes from multi-view images, specifically focusing on UAV aerial imagery datasets.
-
-# What is OpenSplat?
-OpenSplat is a free and open-source implementation of 3D Gaussian Splatting written in C++, focused on being portable, lean and fast. It transforms camera poses and sparse points from various 3D reconstruction systems into optimized 3D Gaussian scene representations that can be viewed, edited, and rendered in other software.
-
-## Core Components
-Input Processing: Handles loading and parsing camera poses and sparse points from various formats (COLMAP, OpenSfM, ODM, OpenMVG, or Nerfstudio).
-Gaussian Model: Each Gaussian is represented by position (3D mean), scale (size in 3 dimensions), rotation (quaternion), color features (including spherical harmonics for view-dependent effects), and opacity.
-Rendering Pipeline: Projects 3D Gaussians to 2D screen space based on camera parameters, computes view-dependent colors using spherical harmonics, and rasterizes with alpha blending to produce the final image.
-Adaptive Density Control: Implements densification (splitting/cloning Gaussians with high view-space gradients), pruning (removing Gaussians with low opacity), and alpha reset.
-
-## How 3D Gaussian Splatting Works
-The algorithm follows these key steps:
-Initialization: A Structure-from-Motion (SfM) system like COLMAP provides initial camera poses and a sparse point cloud, which seeds the Gaussian model.
-Forward Pass: Randomly select a training camera viewpoint, project 3D Gaussians to the camera plane, and render the scene.
-Loss Calculation: Compute combined L1 and SSIM loss between rendered and ground truth images.
-Backpropagation: Update Gaussian parameters through gradient-based optimization.
 Densification & Pruning: Periodically split or duplicate Gaussians in high-gradient regions and prune low-opacity Gaussians.
 
-## Training Parameters
-OpenSplat provides various parameters to control the training process:
+# Objectives
+Build a reproducible Windows pipeline from raw frames to splat output.
 
-| Parameter | Description | Default |
-|-----------|-------|-------------|
-| `num-iters` | Training iterations | 30000 |
-| `downscale-factor ` |	Scale input images by this factor|	1.0
-| `sh-degree `|	Maximum spherical harmonics degree|	3
-| `ssim-weight `|	Weight for structural similarity loss|	0.2
-| `refine-every `|	Split/duplicate/prune Gaussians every N steps|	100
-| `warmup-length `|	Only start densification after N steps|	500
-| `densify-grad-thresh `|	Gradient threshold for Gaussian splitting|	0.0002
+Handle large sequential subsets (disk, SQLite locks, long Mapper).
 
-For detailed information about building and installing OpenSplat, see the official repository.
+Document commands, paths, and deliverable metrics for coursework.
 
-# Dataset Characteristics
-The AMtown02 dataset used in this workflow consists of UAV (Unmanned Aerial Vehicle) imagery captured over terrain. Key characteristics include:
+
+# Dataset(AMtown02, step-10 subset)
+
 | Property | Value |
 |----------|-------|
 | **Dataset Name** | AMtown02 |
-| **Number of Images** | 20 (for clip subset) to full sequence |
-| **Image Format** | PNG/JPEG (frame_XXXXXX.png, six‑digit numbering) |
-| **Initial SfM Points** | ~3343 |
-| **Camera Model** | Pinhole |
-| **Source** | UAVScenes / Aerial Imagery |
+| **Frame range** | 200 – 7498 |
+| **Decimation** | Step 10 (one frame every 10)|
+| **Approx. copied images** | ~730 (confirm via make_clip_scene) |
+| **Image files** | PNG, frame_XXXXXX.png |
+| **COLMAP camera model (typical)** | SIMPLE_RADIAL, single_camera |
+| **Resolution (typical from COLMAP logs)** | ≈ 2448 × 2048 |
 
-## Dataset Characteristics
-Temporal Coverage: Single capture session (timestamp-based filenames)
-Spatial Coverage: Terrain region suitable for aerial reconstruction
-Capture Pattern: Sequential flight path (video‑like sequence)
-Ground Sample Distance: UAV-typical resolution
-Image Selection Criteria: To improve reconstruction stability and reduce computation, select a subset with continuous sequence, good overlap, low blur, and stable motion.
-
-## Data Structure
+## Data layout
 
 ```bash
-data/
-├── images/
-│   ├── frame_000200.png
-│   ├── frame_000210.png
-│   └── ... (selected frames)
-└── sparse/0/
-    ├── cameras.bin
-    ├── images.bin
-    └── points3D.bin
+d:\lzy\OpenSplat-main\
+├── AMtown02_scene\images\
+└── AMtown02_clip_000200_007498_step10_scene\
+    ├── images\
+    ├── database.db
+    └── sparse\0\
+        ├── cameras.bin
+        ├── images.bin
+        └── points3D.bin
 ```
 
 # Prerequisites
