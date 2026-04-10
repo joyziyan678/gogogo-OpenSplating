@@ -59,7 +59,7 @@ Pipeline:
 #  system configuration
 | Component	| Specification|
 |----------|-------|
-|OS|	Windows 10/11|
+|OS|	Windows 11|
 |COLMAP|	Windows CUDA build (colmap-x64-windows-cuda)|
 |OpenSplat|	Pre-built opensplat.exe, CUDA|
 |Scripts|	d:\lzy\OpenSplat-main\OpenSplat-main\scripts\|
