@@ -20,7 +20,7 @@ Handle large sequential subsets (disk, SQLite locks, long Mapper).
 Document commands, paths, and deliverable metrics for coursework.
 
 
-# Dataset(AMtown02, step-10 subset)
+# Dataset(AMtown02)
 
 | Property | Value |
 |----------|-------|
@@ -87,7 +87,7 @@ In PowerShell (modify the start frame, end frame, and step as needed):
 ```bash
 powershell -ExecutionPolicy Bypass -File "d:\lzy\OpenSplat-main\OpenSplat-main\scripts\make_clip_scene.ps1" `
     -SourceWorkspace "d:\lzy\OpenSplat-main\AMtown02_scene" `
-    -StartIndex 200 -EndIndex 7498 -Step 10
+    -StartIndex 200 -EndIndex 7498 
 ```
 
 After execution, a directory similar to d:\lzy\OpenSplat-main\AMtown02_clip_000200_007498_step10_scene\ will be created, under which the images\ subfolder contains the subset.
