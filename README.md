@@ -1,36 +1,36 @@
 # gogogo-OpenSplating
 
 # Local COLMAP + OpenSplat Pipeline (Windows)
-This repository provides a step‑by‑step local workflow to go from a sequence of images to a final .splat file using COLMAP (sparse reconstruction) and OpenSplat (Gaussian Splatting training).
-All operations run on a Windows machine – no cloud uploads, no remote training, no packaging/migration.
+This document provides a strictly local procedure to go from an existing image sequence to a final .splat file using COLMAP sparse reconstruction and OpenSplat Gaussian training.
+No cloud upload, no remote training, no packaging or migration.
 Based on OpenSplat by pierotofy.
 
-# Prerequisites
-Make sure the following are present on your system:
+# Scope
+Under the local Windows directory d:\lzy\OpenSplat-main, starting from an existing image sequence, perform COLMAP sparse reconstruction and OpenSplat Gaussian training sequentially until a splat file is obtained.
+All operations below are local – no cloud upload, no remote training, no packaging/migration.
 
-Component and Expected path (example)
-COLMAP (CUDA version)	d:\lzy\OpenSplat-main\colmap-x64-windows-cuda\bin\colmap.exe
-OpenSplat executable	d:\lzy\OpenSplat-main\opensplat (1)\opensplat\opensplat.exe
-Helper scripts	d:\lzy\OpenSplat-main\OpenSplat-main\scripts\make_clip_scene.ps1
+# Step 1 – Verify Program and Script Locations
+Before starting, confirm that the following paths exist (if your installation paths differ, replace them in the commands later):
+
+d:\lzy\OpenSplat-main\colmap-x64-windows-cuda\bin\colmap.exe
+d:\lzy\OpenSplat-main\opensplat (1)\opensplat\opensplat.exe
+d:\lzy\OpenSplat-main\OpenSplat-main\scripts\make_clip_scene.ps1
 d:\lzy\OpenSplat-main\OpenSplat-main\scripts\colmap_reconstruct.ps1
 
-The script colmap_reconstruct.ps1 automatically finds COLMAP.
-Alternatively, set the environment variable COLMAP_EXE to point to your colmap.exe.
+COLMAP is automatically located by colmap_reconstruct.ps1; alternatively, you can set the environment variable COLMAP_EXE to point to colmap.exe.
 
-# Step 1 – Prepare Your Image Data
-Place your full image sequence in a folder, for example:
+# Step 2 – Prepare Image Data
+The full dataset should be placed, for example, at:
 
-```bash
 d:\lzy\OpenSplat-main\AMtown02_scene\images\
-```
 
-Image filenames should be zero‑padded, e.g. frame_000200.png.
-If you want to run COLMAP on the whole dataset, skip the next step and use the above folder as your workspace later.
+Example image filenames: frame_000200.png (six‑digit numbering).
 
-# Step 2 – (Optional) Create a Sub‑set Workspace
-When the full sequence is too large, you can extract a contiguous frame range into a separate workspace.
+If you plan to run COLMAP directly on the full scene, you can skip the next step and later set the Workspace to the directory containing AMtown02_scene.
 
-Run this PowerShell command (adjust -StartIndex, -EndIndex, -Step as needed):
+# Step 3 – (Optional) Generate a Sub‑set Workspace
+If the number of frames is too large, or if disk space or time is limited, you can first copy a range of frames into an independent folder and then run COLMAP on that folder.
+In PowerShell (modify the start frame, end frame, and step as needed):
 
 ```bash
 powershell -ExecutionPolicy Bypass -File "d:\lzy\OpenSplat-main\OpenSplat-main\scripts\make_clip_scene.ps1" `
@@ -38,14 +38,11 @@ powershell -ExecutionPolicy Bypass -File "d:\lzy\OpenSplat-main\OpenSplat-main\s
     -StartIndex 200 -EndIndex 7498 -Step 10
 ```
 
-What it does:
-Creates a new workspace like d:\lzy\OpenSplat-main\AMtown02_clip_000200_007498_step10_scene\ containing an images\ subfolder with the selected frames.
+After execution, a directory similar to d:\lzy\OpenSplat-main\AMtown02_clip_000200_007498_step10_scene\ will be created, under which the images\ subfolder contains the subset.
+Use the -DestWorkspace parameter if you need a custom output directory.
 
-Use -DestWorkspace to specify a custom output directory.
-
-# Step 3 – Run Full COLMAP Reconstruction
-Choose a workspace (full scene or the clip from Step 2). The workspace must already contain an images\ folder.
-
+# Step 4 – Run the Full COLMAP Pipeline
+Choose a workspace directory (the full scene or the clip generated in the previous step). This directory must already have an images\ subfolder.
 Execute:
 
 ```bash
@@ -53,29 +50,23 @@ powershell -ExecutionPolicy Bypass -File "d:\lzy\OpenSplat-main\OpenSplat-main\s
     -Workspace "d:\lzy\OpenSplat-main\AMtown02_clip_000200_007498_step10_scene"
 ```
 
-The script performs: feature extraction → sequential matcher (for video‑like sequences) → mapper.
+The script performs in order: feature extraction → sequential matcher (for video sequences) → mapper.
+If you have an unordered photo set, add -Exhaustive at the end of the above command (runtime will increase significantly).
+While the script is running, do not open a second COLMAP instance that accesses the same database.db.
 
-For unordered photo collections, add -Exhaustive at the end (this increases runtime significantly).
-
-Do not open another COLMAP instance that accesses the same database.db while the script is running.
-
-# Step 4 – Verify COLMAP Success
-Proceed only if both conditions are true:
+#  Step 5 – Verify COLMAP Finished Successfully
+Proceed to OpenSplat only when both of the following conditions are met:
 
 The PowerShell script finishes without errors.
-
-The following files exist inside your workspace:
-
-```bash
+The following files exist:
 <Workspace>\sparse\0\cameras.bin
 <Workspace>\sparse\0\images.bin
 <Workspace>\sparse\0\points3D.bin
-```
 
-The same directory should also contain database.db – it will be used by OpenSplat.
+The same directory should also contain database.db; the training phase depends on the COLMAP project and the image correspondences.
 
-#  Step 5 – Train with OpenSplat
-Navigate to the directory where you want the output splat.ply (usually the project root) and run:
+# Step 6 – Run OpenSplat Training
+In PowerShell, change to the directory where you want the output splat.ply (usually the project root), then execute:
 
 ```bash
 cd "d:\lzy\OpenSplat-main"
@@ -83,43 +74,33 @@ cd "d:\lzy\OpenSplat-main"
     "d:\lzy\OpenSplat-main\AMtown02_clip_000200_007498_step10_scene" -n 5000
 ```
 
-Parameters:
+-n specifies the number of iterations; you can change it to 2000–10000 depending on your GPU and time budget.
+Add -o <path> if you need to specify an output file.
+Run opensplat.exe --help to see other parameters.
 
--n : number of iterations (adjust to 2000–10000 depending on your GPU and time).
--o : optional output file path (e.g. -o my_model.splat).
+# Step 7 – Confirm Training Completion
+After training finishes normally, the current working directory (the one you cd to in the previous step) should contain splat.ply and cameras.json.
+If you used -o, look for the output file at the specified path.
 
-Run opensplat.exe --help for all options.
+# Step 8 – View the Result Locally
+Open the resulting splat.ply or exported .splat file with a locally installed 3D Gaussian viewer or editor (e.g.[, common web viewers, SuperSplat, CloudCompare, etc.](https://playcanvas.com/viewer), depending on the tools you have installed).
 
-# Step 6 – Confirm Training Finished
-After successful training, the current working directory (the one you cd to) will contain:
+# Appendix – When You Need to Re‑run COLMAP
+If you encounter a database is locked error, a mid‑way failure, or want to switch to a different subset:
 
-splat.ply
-cameras.json
+Close COLMAP.
 
-If you used -o, look for the output at the specified path.
-
-# Step 7 – View the Result Locally
-Open the resulting splat.ply or .splat file with a local 3D Gaussian viewer, such as:
-
-[SuperSplat
-CloudCompare](https://playcanvas.com/viewer)
-
-Any other web‑based or native viewer you have installed.
-
-# Appendix – Re‑running COLMAP
-If you encounter database is locked, a crash, or want to switch to a different subset:
-
-1.Close any COLMAP GUI.
-
-2.Delete the following inside the workspace:
+Delete the following inside the workspace:
 
 database.db
-*.db-wal / *.db-shm files (if present)
+
+any *.db-wal / *.db-shm files
+
 the entire sparse folder
 
-3.Re‑run Step 3.
+Then re‑run Step 4.
 
-Ensure you have enough free disk space before restarting.
+Make sure you have enough disk space.
 
 # License & Credits
 This workflow uses:
