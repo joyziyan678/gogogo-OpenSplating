@@ -46,16 +46,6 @@ d:\lzy\OpenSplat-main\
         └── points3D.bin
 ```
 
-# Prerequisites
-Make sure the following are present on your system:
-| Component	| Expected path (example) |
-|----------|-------|
-|COLMAP (CUDA version) |	d:\lzy\OpenSplat-main\colmap-x64-windows-cuda\bin\colmap.exe
-|OpenSplat executable |	d:\lzy\OpenSplat-main\opensplat (1)\opensplat\opensplat.exe
-|Helper scripts	 |  d:\lzy\OpenSplat-main\OpenSplat-main\scripts\make_clip_scene.ps1 d:\lzy\OpenSplat-main\OpenSplat-main\scripts\colmap_reconstruct.ps1
-
-The script colmap_reconstruct.ps1 automatically finds COLMAP. Alternatively, set the environment variable COLMAP_EXE to point to your colmap.exe.
-
 # Methodology
 Pipeline:
 
@@ -73,6 +63,17 @@ Pipeline:
 |COLMAP|	Windows CUDA build (colmap-x64-windows-cuda)|
 |OpenSplat|	Pre-built opensplat.exe, CUDA|
 |Scripts|	d:\lzy\OpenSplat-main\OpenSplat-main\scripts\|
+
+
+# Prerequisites
+Make sure the following are present on your system:
+| Component	| Expected path (example) |
+|----------|-------|
+|COLMAP (CUDA version) |	d:\lzy\OpenSplat-main\colmap-x64-windows-cuda\bin\colmap.exe
+|OpenSplat executable |	d:\lzy\OpenSplat-main\opensplat (1)\opensplat\opensplat.exe
+|Helper scripts	 |  d:\lzy\OpenSplat-main\OpenSplat-main\scripts\make_clip_scene.ps1 d:\lzy\OpenSplat-main\OpenSplat-main\scripts\colmap_reconstruct.ps1
+
+The script colmap_reconstruct.ps1 automatically finds COLMAP. Alternatively, set the environment variable COLMAP_EXE to point to your colmap.exe.
 
 
 # Step 1 – Prepare Image Data
