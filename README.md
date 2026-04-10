@@ -144,7 +144,8 @@ Open the resulting splat.ply or exported .splat file with a locally installed 3D
 # Results — deliverable files (measured)
 Source files: zcameras(3).json, zsplat(3).ply
 
-<img width="1034" height="1145" alt="bdc21156582e71f7302e0cebbab0d8ed" src="https://github.com/user-attachments/assets/a4410c5f-d521-4478-bded-aefe29d6f87c" />
+<img width="805" height="1139" alt="b3ccd2b187976eb45fcfac39a2f19136" src="https://github.com/user-attachments/assets/eb099731-38fc-4305-a82d-c3dd27b99878" />
+
 
 
 | Metric	| Value |
